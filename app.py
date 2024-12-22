@@ -3,7 +3,7 @@ from perplexity import PerplexityClient
 import re
 
 # Configure sua chave de API do Perplexity
-client = PerplexityClient(api_key="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")
+client = PerplexityClient(api_key=st.secrets["PERPLEXITY_API_KEY"])
 
 @st.cache_data
 def gerar_resposta_generica(pergunta):
