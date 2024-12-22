@@ -123,3 +123,32 @@ def main():
         if pergunta:
             st.session_state.pergunta = pergunta
             resposta_generica = gerar_resposta_generica(pergunta)
+            resposta_especializada = gerar_resposta_especializada(pergunta)
+            
+            st.subheader("Resposta do ChatGPT:")
+            st.write(resposta_generica)
+            
+            st.subheader("Resposta Verdadeira:")
+            st.write(resposta_especializada)
+            
+            if st.button("Perguntar de novo"):
+                st.session_state.clear_input = True
+                st.experimental_rerun()
+        else:
+            st.warning("Por favor, digite uma pergunta.")
+
+    # Seção de feedback
+    st.markdown("---")
+    st.subheader("Dê um feedback e uma ideia de como melhorar este app")
+    feedback = st.text_area("Seu feedback:", height=100)
+    if st.button("Enviar Feedback"):
+        if feedback:
+            if enviar_email(feedback):
+                st.success("Feedback enviado com sucesso! Obrigado pela sua contribuição.")
+            else:
+                st.error("Houve um problema ao enviar o feedback. Por favor, tente novamente mais tarde.")
+        else:
+            st.warning("Por favor, escreva seu feedback antes de enviar.")
+
+if __name__ == "__main__":
+    main()
