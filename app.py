@@ -84,7 +84,7 @@ def limpar_resposta(resposta):
 st.markdown("<img src='https://upload.wikimedia.org/wikipedia/commons/d/d4/Flag_of_Israel.svg' width='50' style='display: block; margin: auto;'>", unsafe_allow_html=True)
 
 # Interface do Streamlit
-st.markdown("<h1 style='text-align: center;'>Q&A sobre<br>O Conflito árabe-israelense<br>@jaymenigri</h1>", unsafe_allow_html=True)
+st.markdown("<h1 style='text-align: center;'>Q&A sobre<br>O Conflito árabe-israelense<br>@jaymenigri</h1><br><h2 style='text-align: center;'>Q&A sobre<br>O Conflito árabe-israelense<br>@jaymenigri</h2>", unsafe_allow_html=True)
 
 def main():
     if 'clear_input' not in st.session_state:
