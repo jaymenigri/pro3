@@ -1,20 +1,20 @@
-import openai
 import streamlit as st
+from perplexity import PerplexityClient
 import re
 
-# Configure sua chave de API do OpenAI
-openai.api_key = st.secrets["OPENAI_API_KEY"]
+# Configure sua chave de API do Perplexity
+client = PerplexityClient(api_key="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")
 
 @st.cache_data
 def gerar_resposta_generica(pergunta):
     try:
-        response = openai.ChatCompletion.create(
-            model="gpt-4",
+        response = client.chat.completions.create(
+            model="sonar-medium-chat",
             messages=[{"role": "user", "content": pergunta}],
             max_tokens=500,
             temperature=0.5,
         )
-        resposta = response["choices"][0]["message"]["content"].strip()
+        resposta = response.choices[0].message.content.strip()
         return limpar_resposta(resposta)
     except Exception as e:
         return f"Ocorreu um erro ao gerar a resposta genérica: {str(e)}"
@@ -49,8 +49,8 @@ def gerar_resposta_especializada(pergunta):
         f"Pergunta: {pergunta}"
     )
     try:
-        response = openai.ChatCompletion.create(
-            model="gpt-4",
+        response = client.chat.completions.create(
+            model="sonar-medium-chat",
             messages=[
                 {"role": "system", "content": custom_prompt},
                 {"role": "user", "content": pergunta}
@@ -58,7 +58,7 @@ def gerar_resposta_especializada(pergunta):
             max_tokens=500,
             temperature=0.3,
         )
-        resposta = response["choices"][0]["message"]["content"].strip()
+        resposta = response.choices[0].message.content.strip()
         return limpar_resposta(resposta)
     except Exception as e:
         return f"Ocorreu um erro ao gerar a resposta especializada: {str(e)}"
@@ -100,7 +100,7 @@ def main():
             resposta_generica = gerar_resposta_generica(pergunta)
             resposta_especializada = gerar_resposta_especializada(pergunta)
             
-            st.subheader("Resposta do ChatGPT:")
+            st.subheader("Resposta do Perplexity:")
             st.write(resposta_generica)
             
             st.subheader("Resposta Verdadeira:")
