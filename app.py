@@ -38,7 +38,20 @@ def gerar_resposta_especializada(pergunta):
         "International Fellowship of Christians and Jews", "Jewish Federations of North America",
         "Nefesh B'Nefesh", "Birthright Israel", "Masa Israel Journey", "El Al Israel Airlines",
         "Keren Hayesod", "Keren Kayemeth LeIsrael", "Zionist Federation of Great Britain and Ireland",
-        "Zionist Federation of Australia", "Zionist Federation of Canada", "Zionist Federation of South Africa"
+        "Zionist Federation of Australia", "Zionist Federation of Canada", "Zionist Federation of South Africa",
+        "Martin Buber", "Theodor Herzl", "Golda Meir", "Asher Ginsberg",
+        "David Ben-Gurion", "Abraham Isaac Kook", "Vladimir Jabotinsky", "Yosef Haim Yerushalmi",
+        "Gershom Scholem", "Emmanuel Levinas", "Nathan Sharansky", "Yehuda Amichai",
+        "Adin Steinsaltz", "Jonathan Sacks", "Alan Dershowitz", "Yeshayahu Leibowitz",
+        "Amos Oz", "A.B. Yehoshua", "Daniel Gordis", "Gil Troy",
+        "Deborah Lipstadt", "Bernard Lewis", "Ruth Wisse", "Dennis Prager",
+        "Benny Morris", "Michael Walzer", "Yossi Klein Halevi", "David Hazony",
+        "Einat Wilf", "Irwin Cotler", "Natan Sharansky", "Joseph Telushkin",
+        "Daniel Polisar", "Yehuda Kurtzer", "Michael Oren", "Ruth Gavison",
+        "Moshe Halbertal", "David Mamet", "Leon Wieseltier", "Cynthia Ozick",
+        "Hillel Halkin", "Meir Soloveichik", "Norman Podhoretz", "Ruth Calderon",
+        "Yael Feldman", "Susannah Heschel", "Anita Shapira", "Michael Fishbane",
+        "Steven Bayme", "Robert Wistrich"
     ]
     
     fontes_str = ", ".join(fontes)
@@ -139,7 +152,7 @@ def main():
 
     # Seção de feedback
     st.markdown("---")
-    st.subheader("Dê feedback e sugestões")
+    st.subheader("Dê feedback e sugestões. Coloque seu nome.")
     feedback = st.text_area("Seu feedback:", height=100)
     if st.button("Enviar Feedback"):
         if feedback:
