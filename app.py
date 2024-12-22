@@ -87,27 +87,30 @@ st.markdown("<img src='https://upload.wikimedia.org/wikipedia/commons/d/d4/Flag_
 st.markdown("<h1 style='text-align: center;'>Q&A sobre<br>O Conflito árabe-israelense</h1>", unsafe_allow_html=True)
 
 def main():
-    container = st.empty()
-    
-    with container.form("pergunta_form"):
-        pergunta = st.text_input("Faça sua pergunta sobre o conflito árabe-israelense:", key="pergunta_input")
-        pesquisar = st.form_submit_button("Pesquisar")
+    if 'clear_input' not in st.session_state:
+        st.session_state.clear_input = False
 
-    if pesquisar and pergunta:
-        resposta_generica = gerar_resposta_generica(pergunta)
-        resposta_especializada = gerar_resposta_especializada(pergunta)
-        
-        st.subheader("Resposta do ChatGPT:")
-        st.write(resposta_generica)
-        
-        st.subheader("Resposta Verdadeira:")
-        st.write(resposta_especializada)
-        
-        if st.button("Perguntar de novo"):
-            container.empty()
-            st.experimental_rerun()
-    elif pesquisar:
-        st.warning("Por favor, digite uma pergunta.")
+    pergunta = st.text_input("Faça sua pergunta sobre o conflito árabe-israelense:", value="" if st.session_state.clear_input else st.session_state.get('pergunta', ''))
+    if st.session_state.clear_input:
+        st.session_state.clear_input = False
+
+    if st.button("Pesquisar"):
+        if pergunta:
+            st.session_state.pergunta = pergunta
+            resposta_generica = gerar_resposta_generica(pergunta)
+            resposta_especializada = gerar_resposta_especializada(pergunta)
+            
+            st.subheader("Resposta do ChatGPT:")
+            st.write(resposta_generica)
+            
+            st.subheader("Resposta Verdadeira:")
+            st.write(resposta_especializada)
+            
+            if st.button("Perguntar de novo"):
+                st.session_state.clear_input = True
+                st.experimental_rerun()
+        else:
+            st.warning("Por favor, digite uma pergunta.")
 
 if __name__ == "__main__":
     main()
