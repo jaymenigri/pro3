@@ -4,8 +4,19 @@ import streamlit as st
 # Configure sua chave de API do OpenAI
 openai.api_key = "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"
 
-# Função para gerar resposta
-def gerar_resposta(pergunta):
+def gerar_resposta_generica(pergunta):
+    try:
+        response = openai.ChatCompletion.create(
+            model="gpt-4",
+            messages=[{"role": "user", "content": pergunta}],
+            max_tokens=150,
+            temperature=0.7,
+        )
+        return response["choices"][0]["message"]["content"].strip()
+    except Exception as e:
+        return f"Ocorreu um erro ao gerar a resposta genérica: {str(e)}"
+
+def gerar_resposta_especializada(pergunta):
     custom_prompt = (
         "Responda esta pergunta com base exclusivamente nas seguintes fontes: "
         "- Livro: 'A History of Israel' de Benny Morris. "
@@ -14,7 +25,6 @@ def gerar_resposta(pergunta):
         "Ignore quaisquer outras fontes ou interpretações."
         f"\n\nPergunta: {pergunta}"
     )
-
     try:
         response = openai.ChatCompletion.create(
             model="gpt-4",
@@ -23,15 +33,23 @@ def gerar_resposta(pergunta):
             temperature=0.7,
         )
         return response["choices"][0]["message"]["content"].strip()
-
     except Exception as e:
-        return f"Ocorreu um erro ao gerar a resposta: {str(e)}"
+        return f"Ocorreu um erro ao gerar a resposta especializada: {str(e)}"
 
 # Interface do Streamlit
 st.title("Aplicativo de Perguntas e Respostas sobre Israel")
 
 pergunta = st.text_input("Faça sua pergunta sobre Israel:")
 
-if pergunta:
-    resposta = gerar_resposta(pergunta)
-    st.write(resposta)
+if st.button("Pesquisar"):
+    if pergunta:
+        resposta_generica = gerar_resposta_generica(pergunta)
+        resposta_especializada = gerar_resposta_especializada(pergunta)
+        
+        st.subheader("Resposta Genérica (ChatGPT):")
+        st.write(resposta_generica)
+        
+        st.subheader("Resposta Especializada (Fontes Específicas):")
+        st.write(resposta_especializada)
+    else:
+        st.warning("Por favor, digite uma pergunta.")
