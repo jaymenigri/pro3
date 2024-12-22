@@ -1,4 +1,2 @@
 streamlit
-perplexity-api
-perplexity-python==1.0.0
 openai
