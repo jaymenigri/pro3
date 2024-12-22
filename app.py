@@ -1,15 +1,16 @@
 import openai
 import streamlit as st
 import re
+from openai import OpenAI
 
 # Configure sua chave de API do OpenAI
-openai.api_key = st.secrets["OPENAI_API_KEY"]
+client = OpenAI(api_key=st.secrets["OPENAI_API_KEY"])
 
 @st.cache_data
 def gerar_resposta_generica(pergunta):
     try:
-        response = openai.ChatCompletion.create(
-            model="gpt-4",
+        response = client.chat.completions.create(
+            model="gpt-4o",
             messages=[
                 {"role": "system", "content": "Você é um assistente especializado em fornecer informações sobre o conflito árabe-israelense. Responda às perguntas de forma direta, sem mencionar fontes ou métodos de obtenção da informação."},
                 {"role": "user", "content": pergunta}
@@ -17,7 +18,7 @@ def gerar_resposta_generica(pergunta):
             max_tokens=500,
             temperature=0.5,
         )
-        resposta = response["choices"][0]["message"]["content"].strip()
+        resposta = response.choices[0].message.content.strip()
         return limpar_resposta(resposta)
     except Exception as e:
         return f"Ocorreu um erro ao gerar a resposta genérica: {str(e)}"
@@ -48,8 +49,8 @@ def gerar_resposta_especializada(pergunta):
         f"Pergunta: {pergunta}"
     )
     try:
-        response = openai.ChatCompletion.create(
-            model="gpt-4",
+        response = client.chat.completions.create(
+            model="gpt-4o",
             messages=[
                 {"role": "system", "content": custom_prompt},
                 {"role": "user", "content": pergunta}
@@ -57,7 +58,7 @@ def gerar_resposta_especializada(pergunta):
             max_tokens=500,
             temperature=0.5,
         )
-        resposta = response["choices"][0]["message"]["content"].strip()
+        resposta = response.choices[0].message.content.strip()
         return limpar_resposta(resposta)
     except Exception as e:
         return f"Ocorreu um erro ao gerar a resposta especializada: {str(e)}"
