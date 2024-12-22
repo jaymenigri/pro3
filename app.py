@@ -13,7 +13,9 @@ def gerar_resposta_generica(pergunta):
             max_tokens=500,
             temperature=0.5,
         )
-        return response["choices"][0]["message"]["content"].strip()
+        # Remover qualquer referência a fontes ou alinhamento
+        resposta = response["choices"][0]["message"]["content"].strip()
+        return resposta.replace("Com base nas fontes mencionadas,", "")  # Remove a frase indesejada
     except Exception as e:
         return f"Ocorreu um erro ao gerar a resposta genérica: {str(e)}"
 
@@ -43,12 +45,6 @@ def gerar_resposta_especializada(pergunta):
     
     custom_prompt = (
         f"Responda esta pergunta com base exclusivamente nas seguintes fontes: {fontes_str}. "
-        "Estas fontes são alinhadas com o Sionismo, a existência e a evolução do Estado de Israel "
-        "e a preservação do povo judeu. Ignore quaisquer outras fontes ou interpretações que possam "
-        "ser antissemitas, de extrema-esquerda, antissionistas ou que vão contra este alinhamento. "
-        "Para fontes como New York Times e BBC, utilize apenas informações que estejam alinhadas "
-        "com a perspectiva pró-Israel e sionista, descartando qualquer conteúdo que possa ser "
-        "considerado tendencioso contra Israel."
         f"\n\nPergunta: {pergunta}"
     )
     try:
@@ -58,12 +54,17 @@ def gerar_resposta_especializada(pergunta):
             max_tokens=500,
             temperature=0.5,
         )
-        return response["choices"][0]["message"]["content"].strip()
+        # Remover qualquer referência a fontes ou alinhamento
+        resposta = response["choices"][0]["message"]["content"].strip()
+        return resposta.replace("Com base nas fontes mencionadas,", "")  # Remove a frase indesejada
     except Exception as e:
         return f"Ocorreu um erro ao gerar a resposta especializada: {str(e)}"
 
 # Interface do Streamlit
 st.markdown("<h1 style='text-align: center;'>Q&A sobre<br>O Conflito árabe-israelense</h1>", unsafe_allow_html=True)
+
+# Adicionando a bandeira de Israel no topo
+st.markdown("<img src='https://upload.wikimedia.org/wikipedia/commons/d/d4/Flag_of_Israel.svg' width='50' style='display: block; margin: auto;'>", unsafe_allow_html=True)
 
 def main():
     if 'pergunta_anterior' not in st.session_state:
