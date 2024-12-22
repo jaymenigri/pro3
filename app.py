@@ -4,18 +4,20 @@ import streamlit as st
 # Configure sua chave de API do OpenAI
 openai.api_key = st.secrets["OPENAI_API_KEY"]
 
+@st.cache_data
 def gerar_resposta_generica(pergunta):
     try:
         response = openai.ChatCompletion.create(
             model="gpt-4",
             messages=[{"role": "user", "content": pergunta}],
-            max_tokens=1000,
-            temperature=0.7,
+            max_tokens=500,
+            temperature=0.5,
         )
         return response["choices"][0]["message"]["content"].strip()
     except Exception as e:
         return f"Ocorreu um erro ao gerar a resposta genérica: {str(e)}"
 
+@st.cache_data
 def gerar_resposta_especializada(pergunta):
     fontes = [
         "Haaretz", "CONIB (Confederação Israelita do Brasil)", "The Jewish Agency for Israel",
@@ -53,21 +55,25 @@ def gerar_resposta_especializada(pergunta):
         response = openai.ChatCompletion.create(
             model="gpt-4",
             messages=[{"role": "user", "content": custom_prompt}],
-            max_tokens=1000,
-            temperature=0.7,
+            max_tokens=500,
+            temperature=0.5,
         )
         return response["choices"][0]["message"]["content"].strip()
     except Exception as e:
         return f"Ocorreu um erro ao gerar a resposta especializada: {str(e)}"
 
 # Interface do Streamlit
-st.title("Q&A sobre O Conflito árabe-israelense")
+st.markdown("<h1 style='text-align: center;'>Q&A sobre<br>O Conflito árabe-israelense</h1>", unsafe_allow_html=True)
 
 def main():
-    pergunta = st.text_input("Faça sua pergunta sobre o conflito árabe-israelense:")
+    if 'pergunta_anterior' not in st.session_state:
+        st.session_state.pergunta_anterior = ''
+
+    pergunta = st.text_input("Faça sua pergunta sobre o conflito árabe-israelense:", value=st.session_state.pergunta_anterior)
 
     if st.button("Pesquisar"):
         if pergunta:
+            st.session_state.pergunta_anterior = pergunta
             resposta_generica = gerar_resposta_generica(pergunta)
             resposta_especializada = gerar_resposta_especializada(pergunta)
             
@@ -78,6 +84,7 @@ def main():
             st.write(resposta_especializada)
             
             if st.button("Perguntar de novo"):
+                st.session_state.pergunta_anterior = ''
                 st.experimental_rerun()
         else:
             st.warning("Por favor, digite uma pergunta.")
