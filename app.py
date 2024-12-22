@@ -2,7 +2,7 @@ import openai
 import streamlit as st
 
 # Configure sua chave de API do OpenAI
-openai.api_key = "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"
+openai.api_key = st.secrets["OPENAI_API_KEY"]
 
 def gerar_resposta_generica(pergunta):
     try:
