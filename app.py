@@ -1,6 +1,8 @@
 from openai import OpenAI
 import streamlit as st
 import re
+import smtplib
+from email.mime.text import MIMEText
 
 # Inicialize o cliente OpenAI
 client = OpenAI(api_key=st.secrets["OPENAI_API_KEY"])
@@ -80,6 +82,29 @@ def limpar_resposta(resposta):
         resposta = re.sub(padrao, "", resposta, flags=re.IGNORECASE)
     return resposta.strip()
 
+def enviar_email(feedback):
+    smtp_server = "smtp.gmail.com"
+    port = 587
+    sender_email = “j99868686@gmail.com"  # Substitua pelo seu email
+    password = st.secrets["EMAIL_PASSWORD"]
+
+    msg = MIMEText(feedback)
+    msg['Subject'] = "Novo feedback do app Q&A sobre Conflito árabe-israelense"
+    msg['From'] = sender_email
+    msg['To'] = sender_email
+
+    try:
+        server = smtplib.SMTP(smtp_server, port)
+        server.starttls()
+        server.login(sender_email, password)
+        server.send_message(msg)
+        return True
+    except Exception as e:
+        st.error(f"Erro ao enviar email: {e}")
+        return False
+    finally:
+        server.quit()
+
 # Adicionando a bandeira de Israel no topo
 st.markdown("<img src='https://upload.wikimedia.org/wikipedia/commons/d/d4/Flag_of_Israel.svg' width='50' style='display: block; margin: auto;'>", unsafe_allow_html=True)
 
@@ -98,19 +123,3 @@ def main():
         if pergunta:
             st.session_state.pergunta = pergunta
             resposta_generica = gerar_resposta_generica(pergunta)
-            resposta_especializada = gerar_resposta_especializada(pergunta)
-            
-            st.subheader("Resposta do ChatGPT:")
-            st.write(resposta_generica)
-            
-            st.subheader("Resposta Verdadeira:")
-            st.write(resposta_especializada)
-            
-            if st.button("Perguntar de novo"):
-                st.session_state.clear_input = True
-                st.experimental_rerun()
-        else:
-            st.warning("Por favor, digite uma pergunta.")
-
-if __name__ == "__main__":
-    main()
