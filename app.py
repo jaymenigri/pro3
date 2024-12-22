@@ -85,7 +85,7 @@ def limpar_resposta(resposta):
 def enviar_email(feedback):
     smtp_server = "smtp.gmail.com"
     port = 587
-    sender_email = “j99868686@gmail.com"  # Substitua pelo seu email
+    sender_email = "j99868686@gmail.com"  # Substitua pelo seu email
     password = st.secrets["EMAIL_PASSWORD"]
 
     msg = MIMEText(feedback)
