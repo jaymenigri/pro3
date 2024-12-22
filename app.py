@@ -139,7 +139,7 @@ def main():
 
     # Seção de feedback
     st.markdown("---")
-    st.subheader("Dê um feedback e uma ideia de como melhorar este app")
+    st.subheader("Dê feedback e sugestões")
     feedback = st.text_area("Seu feedback:", height=100)
     if st.button("Enviar Feedback"):
         if feedback:
