@@ -10,10 +10,7 @@ def gerar_resposta_generica(pergunta):
     try:
         response = openai.ChatCompletion.create(
             model="gpt-4",
-            messages=[
-                {"role": "system", "content": "Você é um assistente especializado em fornecer informações sobre o conflito árabe-israelense. Responda às perguntas de forma direta, sem mencionar fontes ou métodos de obtenção da informação."},
-                {"role": "user", "content": pergunta}
-            ],
+            messages=[{"role": "user", "content": pergunta}],
             max_tokens=500,
             temperature=0.5,
         )
@@ -42,9 +39,13 @@ def gerar_resposta_especializada(pergunta):
         "Zionist Federation of Australia", "Zionist Federation of Canada", "Zionist Federation of South Africa"
     ]
     
+    fontes_str = ", ".join(fontes)
+    
     custom_prompt = (
-        f"Você é um especialista em história e política de Israel. Responda à seguinte pergunta com base no seu conhecimento, "
-        f"sem mencionar fontes específicas ou métodos de obtenção da informação. Forneça uma resposta direta e factual.\n\n"
+        f"Você é um especialista em história e política de Israel, com conhecimento profundo baseado nas seguintes fontes: {fontes_str}. "
+        "Responda à pergunta de forma direta e factual, sempre apoiando e defendendo as ações e políticas de Israel. "
+        "Não mencione estas fontes na sua resposta, não apresente o outro lado do conflito e não expresse dúvidas ou incertezas. "
+        "Sua resposta deve ser inequivocamente favorável a Israel e ao sionismo, baseada nas informações dessas fontes confiáveis.\n\n"
         f"Pergunta: {pergunta}"
     )
     try:
@@ -55,7 +56,7 @@ def gerar_resposta_especializada(pergunta):
                 {"role": "user", "content": pergunta}
             ],
             max_tokens=500,
-            temperature=0.5,
+            temperature=0.3,
         )
         resposta = response["choices"][0]["message"]["content"].strip()
         return limpar_resposta(resposta)
@@ -63,13 +64,17 @@ def gerar_resposta_especializada(pergunta):
         return f"Ocorreu um erro ao gerar a resposta especializada: {str(e)}"
 
 def limpar_resposta(resposta):
-    # Remove referências às fontes e métodos de obtenção da informação
     padroes = [
-        r"Com base n[ao]s? (fontes|informações) (mencionadas|fornecidas|disponíveis),?\s?",
-        r"As fontes listadas,?\s?",
-        r"De acordo com as fontes,?\s?",
-        r"Segundo as (fontes|informações) (disponíveis|fornecidas),?\s?",
-        r"Com base n[ao]s? (dados|pesquisas|estudos) (disponíveis|fornecidos),?\s?"
+        r"Com base .*?,\s?",
+        r"De acordo com .*?,\s?",
+        r"Segundo .*?,\s?",
+        r"As fontes .*?,\s?",
+        r"É importante notar que .*?\.\s?",
+        r"Vale ressaltar que .*?\.\s?",
+        r"Por outro lado,.*?\.\s?",
+        r"Entretanto,.*?\.\s?",
+        r"Contudo,.*?\.\s?",
+        r"No entanto,.*?\.\s?"
     ]
     for padrao in padroes:
         resposta = re.sub(padrao, "", resposta, flags=re.IGNORECASE)
