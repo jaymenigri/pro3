@@ -80,11 +80,11 @@ def limpar_resposta(resposta):
         resposta = re.sub(padrao, "", resposta, flags=re.IGNORECASE)
     return resposta.strip()
 
-# Interface do Streamlit
-st.markdown("<h1 style='text-align: center;'>Q&A sobre<br>O Conflito árabe-israelense</h1>", unsafe_allow_html=True)
-
 # Adicionando a bandeira de Israel no topo
 st.markdown("<img src='https://upload.wikimedia.org/wikipedia/commons/d/d4/Flag_of_Israel.svg' width='50' style='display: block; margin: auto;'>", unsafe_allow_html=True)
+
+# Interface do Streamlit
+st.markdown("<h1 style='text-align: center;'>Q&A sobre<br>O Conflito árabe-israelense</h1>", unsafe_allow_html=True)
 
 def main():
     if 'pergunta_anterior' not in st.session_state:
