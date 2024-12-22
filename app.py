@@ -1,5 +1,6 @@
 import openai
 import streamlit as st
+import re
 
 # Configure sua chave de API do OpenAI
 openai.api_key = st.secrets["OPENAI_API_KEY"]
@@ -9,56 +10,70 @@ def gerar_resposta_generica(pergunta):
     try:
         response = openai.ChatCompletion.create(
             model="gpt-4",
-            messages=[{"role": "user", "content": pergunta}],
+            messages=[
+                {"role": "system", "content": "Você é um assistente especializado em fornecer informações sobre o conflito árabe-israelense. Responda às perguntas de forma direta, sem mencionar fontes ou métodos de obtenção da informação."},
+                {"role": "user", "content": pergunta}
+            ],
             max_tokens=500,
             temperature=0.5,
         )
-        # Remover qualquer referência a fontes ou alinhamento
         resposta = response["choices"][0]["message"]["content"].strip()
-        return resposta.replace("Com base nas fontes mencionadas,", "")  # Remove a frase indesejada
+        return limpar_resposta(resposta)
     except Exception as e:
         return f"Ocorreu um erro ao gerar a resposta genérica: {str(e)}"
 
 @st.cache_data
 def gerar_resposta_especializada(pergunta):
     fontes = [
-        "Haaretz", "CONIB (Confederação Israelita do Brasil)", "The Jewish Agency for Israel",
-        "Organização Sionista Mundial", "AIPAC (American Israel Public Affairs Committee)",
-        "Jerusalem Post", "Times of Israel", "Israel Defense Forces (IDF)", "Yad Vashem",
-        "Instituto Herzl", "Instituto Begin-Sadat", "Universidade Hebraica de Jerusalém",
-        "Bar-Ilan University", "Tel Aviv University", "Israel Hayom", "Israel National News",
-        "Zionist Organization of America", "StandWithUs", "StandWithUs Brasil",
-        "CAMERA (Committee for Accuracy in Middle East Reporting in America)", "HonestReporting",
+        "Haaretz", "CONIB", "The Jewish Agency for Israel",
+        "Organização Sionista Mundial", "AIPAC", "Jerusalem Post", "Times of Israel",
+        "Israel Defense Forces", "Yad Vashem", "Instituto Herzl", "Instituto Begin-Sadat",
+        "Universidade Hebraica de Jerusalém", "Bar-Ilan University", "Tel Aviv University",
+        "Israel Hayom", "Israel National News", "Zionist Organization of America",
+        "StandWithUs", "StandWithUs Brasil", "CAMERA", "HonestReporting",
         "Simon Wiesenthal Center", "American Jewish Committee", "Anti-Defamation League",
         "Friends of the IDF", "Hillel International", "Chabad.org", "Jewish Virtual Library",
         "Maccabi World Union", "World Jewish Congress", "B'nai B'rith International",
         "Shurat HaDin", "Im Tirtzu", "Kohelet Policy Forum", "Regavim", "My Israel",
         "Israel Allies Foundation", "Christians United for Israel",
         "International Fellowship of Christians and Jews", "Jewish Federations of North America",
-        "Jewish Agency for Israel", "Nefesh B'Nefesh", "Birthright Israel", "Masa Israel Journey",
-        "El Al Israel Airlines", "Keren Hayesod", "Keren Kayemeth LeIsrael",
-        "Zionist Federation of Great Britain and Ireland", "Zionist Federation of Australia",
-        "Zionist Federation of Canada", "Zionist Federation of South Africa"
+        "Nefesh B'Nefesh", "Birthright Israel", "Masa Israel Journey", "El Al Israel Airlines",
+        "Keren Hayesod", "Keren Kayemeth LeIsrael", "Zionist Federation of Great Britain and Ireland",
+        "Zionist Federation of Australia", "Zionist Federation of Canada", "Zionist Federation of South Africa"
     ]
     
-    fontes_str = ", ".join(fontes)
-    
     custom_prompt = (
-        f"Responda esta pergunta com base exclusivamente nas seguintes fontes: {fontes_str}. "
-        f"\n\nPergunta: {pergunta}"
+        f"Você é um especialista em história e política de Israel. Responda à seguinte pergunta com base no seu conhecimento, "
+        f"sem mencionar fontes específicas ou métodos de obtenção da informação. Forneça uma resposta direta e factual.\n\n"
+        f"Pergunta: {pergunta}"
     )
     try:
         response = openai.ChatCompletion.create(
             model="gpt-4",
-            messages=[{"role": "user", "content": custom_prompt}],
+            messages=[
+                {"role": "system", "content": custom_prompt},
+                {"role": "user", "content": pergunta}
+            ],
             max_tokens=500,
             temperature=0.5,
         )
-        # Remover qualquer referência a fontes ou alinhamento
         resposta = response["choices"][0]["message"]["content"].strip()
-        return resposta.replace("Com base nas fontes mencionadas,", "")  # Remove a frase indesejada
+        return limpar_resposta(resposta)
     except Exception as e:
         return f"Ocorreu um erro ao gerar a resposta especializada: {str(e)}"
+
+def limpar_resposta(resposta):
+    # Remove referências às fontes e métodos de obtenção da informação
+    padroes = [
+        r"Com base n[ao]s? (fontes|informações) (mencionadas|fornecidas|disponíveis),?\s?",
+        r"As fontes listadas,?\s?",
+        r"De acordo com as fontes,?\s?",
+        r"Segundo as (fontes|informações) (disponíveis|fornecidas),?\s?",
+        r"Com base n[ao]s? (dados|pesquisas|estudos) (disponíveis|fornecidos),?\s?"
+    ]
+    for padrao in padroes:
+        resposta = re.sub(padrao, "", resposta, flags=re.IGNORECASE)
+    return resposta.strip()
 
 # Interface do Streamlit
 st.markdown("<h1 style='text-align: center;'>Q&A sobre<br>O Conflito árabe-israelense</h1>", unsafe_allow_html=True)
